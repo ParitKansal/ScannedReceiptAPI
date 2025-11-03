@@ -105,3 +105,4 @@ def predict_image(file: UploadFile):
         "num_detections": len(detections),
         "detections": detections
     }
+

@@ -1,15 +1,18 @@
 # ScannedReceiptAPI: Receipt Detection API
 
-A **FastAPI** server for detecting receipts.
-Supports uploading images and returning **bounding boxes** in both **pixel coordinates** and **normalized format**. Works on **Linux, macOS, and Windows**.
+A **FastAPI** server for detecting receipts using YOLO.
+Supports uploading **one or multiple images** and returns **bounding boxes** in both **pixel coordinates** and **normalized format**.
+Works on **Linux, macOS, and Windows**.
 
-## Requirements
+
+## 🚀 Requirements
 
 * Python 3.10+
 * Conda
-* GPU optional
+* GPU optional (CUDA supported for acceleration)
 
-## Installation
+
+## ⚙️ Installation
 
 1. **Clone the repository**
 
@@ -29,16 +32,17 @@ conda activate ScannedReceipt-fastapi
 
 You can either:
 
-* Place your `.pt` model in the project root (default: `model.pt`)
-* **Or use the provided script to download it automatically if the GitHub model doesn’t work:**
+* Place your YOLO `.pt` model in the project root (default: `model.pt`)
+* **Or download automatically using:**
 
 ```bash
 python download_model.py
 ```
 
-You can also update `app/core/config.py` to use a custom model path.
+You can also modify the model path in `app/core/config.py`.
 
-## Running the API
+
+## ▶️ Running the API
 
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -46,64 +50,128 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 * Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-## API Usage
+
+## 🧠 API Usage
 
 ### Endpoint
 
 `POST /predict`
 
-* **Description:** Upload an image and get detected receipts
-* **Request:** `multipart/form-data` with `file` field (image)
+* **Description:** Upload **one or more receipt images** and get detected bounding boxes.
+* **Request:** `multipart/form-data` with field name `files`
 * **Response (JSON):**
 
 ```json
 {
-  "filename": "random_crop_rot0_103_13_8.FRIENDS UNITED LTD - RECEIPTS (JUNE) 6_page_5_filled.jpg",
-  "timestamp": "20251103_111250",
-  "num_detections": 4,
-  "detections": [
+  "results": [
     {
-      "confidence": 0.9708718061447144,
-      "x1": 566.3211059570312,
-      "y1": 0,
-      "x2": 1160.4078369140625,
-      "y2": 1151.1822509765625,
-      "x_center": 0.390662656758166,
-      "y_center": 0.2803658672617054,
-      "w_norm": 0.26881752531992364,
-      "h_norm": 0.5607317345234109
-    },
-    ...
+      "filename": "receipt1.jpg",
+      "timestamp": "20251103_132010",
+      "num_detections": 3,
+      "detections": [
+        {
+          "confidence": 0.97,
+          "x1": 566.32,
+          "y1": 0.0,
+          "x2": 1160.40,
+          "y2": 1151.18,
+          "x_center": 0.39,
+          "y_center": 0.28,
+          "w_norm": 0.26,
+          "h_norm": 0.56
+        }
+      ]
+    }
   ]
 }
 ```
 
-### Example: Python client
+
+## 🐍 Example: Python Client
 
 ```python
 import requests
 
 url = "http://localhost:8000/predict"
-with open("receipt.jpg", "rb") as f:
-    files = {"file": f}
-    response = requests.post(url, files=files)
 
+# List of local image paths
+file_paths = [
+    "/path/to/receipt1.jpg",
+    "/path/to/receipt2.jpg"
+]
+
+# Prepare multiple files for upload
+files = [("files", open(path, "rb")) for path in file_paths]
+
+# Send POST request
+response = requests.post(url, files=files)
+
+# Close file handles
+for _, f in files:
+    f.close()
+
+# Print the JSON response
 print(response.json())
 ```
 
-## Folder Structure
+
+## ✂️ Cropping Detected Receipts from Images
+
+You can easily crop the detected bounding boxes from the original image using the prediction results.
+
+```python
+from PIL import Image
+import requests
+from io import BytesIO
+
+# Example: single image crop based on API prediction
+url = "http://localhost:8000/predict"
+image_path = "/path/to/receipt.jpg"
+
+# Send image
+with open(image_path, "rb") as f:
+    files = {"files": f}
+    response = requests.post(url, files=files)
+
+data = response.json()
+detections = data["results"][0]["detections"]
+
+# Open original image
+img = Image.open(image_path)
+
+# Loop through all detections and crop each region
+for i, det in enumerate(detections):
+    x1, y1, x2, y2 = map(int, [det["x1"], det["y1"], det["x2"], det["y2"]])
+    cropped = img.crop((x1, y1, x2, y2))
+    cropped.save(f"cropped_receipt_{i+1}.jpg")
+    print(f"Saved cropped image: cropped_receipt_{i+1}.jpg")
+```
+
+### 🧩 Output
+
+* Each detected region is saved as a new image file:
+
+  ```
+  cropped_receipt_1.jpg
+  cropped_receipt_2.jpg
+  ...
+  ```
+* You can further process or OCR these cropped regions for text extraction.
+
+
+## 📂 Folder Structure
 
 ```
 ScannedReceiptAPI/
 │
 ├─ app/
-│   ├─ main.py             # FastAPI app
-│   ├─ predict.py          # YOLO prediction logic
+│   ├─ main.py             # FastAPI app entry point
+│   ├─ predict.py          # YOLO prediction & post-processing logic
 │   └─ core/
-│       └─ config.py       # Model & output configuration
+│       └─ config.py       # Configuration (model path, thresholds, etc.)
 │
 ├─ environment.yml         # Conda environment file
-├─ download_model.py       # Script to download model from Google Drive
-├─ model.pt                # YOLOv9 model
+├─ download_model.py       # Optional model download script
+├─ model.pt                # YOLO model weights
 └─ README.md
 ```
