@@ -94,6 +94,6 @@ ScannedReceiptAPI/
 │       └─ config.py       # Model & output configuration
 │
 ├─ environment.yml         # Conda environment file
-├─ best-2.pt               # YOLOv9 model
+├─ model.pt                # YOLOv9 model
 └─ README.md
 ```
