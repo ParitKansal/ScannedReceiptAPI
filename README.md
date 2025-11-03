@@ -58,21 +58,30 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ```json
 {
-  "filename": "receipt.jpg",
-  "timestamp": "20251103_101234",
+  "filename": "random_crop_rot0_103_13_8.FRIENDS UNITED LTD - RECEIPTS (JUNE) 6_page_5_filled.jpg",
+  "timestamp": "20251103_111250",
   "num_detections": 4,
   "detections": [
     {
-      "confidence": 0.87,
-      "bbox_xyxy": [102.4, 215.1, 389.7, 610.9],
-      "bbox_normalized": [0.39, 0.65, 0.47, 0.62]
+      "confidence": 0.9708718061447144,
+      "x1": 566.3211059570312,
+      "y1": 0,
+      "x2": 1160.4078369140625,
+      "y2": 1151.1822509765625,
+      "x_center": 0.390662656758166,
+      "y_center": 0.2803658672617054,
+      "w_norm": 0.26881752531992364,
+      "h_norm": 0.5607317345234109
+    },
+    {
+      ...
+    },
+    {
+      ...
     }
   ]
 }
 ```
-
-* `bbox_xyxy`: pixel coordinates `[x1, y1, x2, y2]`
-* `bbox_normalized`: `[x_center, y_center, width, height]` normalized 0–1
 
 ### Example: Python client
 
