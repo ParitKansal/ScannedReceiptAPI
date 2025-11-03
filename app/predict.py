@@ -58,22 +58,13 @@ def merge_boxes_iterative(df, containment_threshold=0.9, max_iter=10):
     return df
 
 # --- Prediction function ---
-def predict_image(file: UploadFile, save_input=False):
+def predict_image(file: UploadFile):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Load image in memory
     img_bytes = file.file.read()
     img = Image.open(BytesIO(img_bytes)).convert("RGB")
     width, height = img.size
-
-    # Save input copy if requested
-    if save_input:
-        from pathlib import Path
-        out_dir = Path("pred_outputs")
-        out_dir.mkdir(parents=True, exist_ok=True)
-        input_path = out_dir / f"input_{timestamp}_{file.filename}"
-        with open(input_path, "wb") as f:
-            f.write(img_bytes)
 
     # Run YOLO prediction
     results = model.predict(
