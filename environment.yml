@@ -14,3 +14,4 @@ dependencies:
       - pydantic-settings==2.11.0
       - python-multipart==0.0.20
       - gdown==5.2.0
+      - pandas==2.3.2
