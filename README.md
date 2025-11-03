@@ -14,7 +14,7 @@ Supports uploading images and returning **bounding boxes** in both **pixel coord
 1. **Clone the repository**
 
 ```bash
-git clone <your-repo-url>
+gh repo clone ParitKansal/ScannedReceiptAPI
 cd ScannedReceiptAPI
 ```
 
