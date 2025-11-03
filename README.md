@@ -7,7 +7,7 @@ Supports uploading images and returning **bounding boxes** in both **pixel coord
 
 * Python 3.10+
 * Conda
-* GPU optional 
+* GPU optional
 
 ## Installation
 
@@ -27,7 +27,15 @@ conda activate ScannedReceipt-fastapi
 
 3. **Ensure model exists**
 
-Place your `.pt` model in the project root (default: `model.pt`).
+You can either:
+
+* Place your `.pt` model in the project root (default: `model.pt`)
+* **Or use the provided script to download it automatically if the GitHub model doesn’t work:**
+
+```bash
+python download_model.py
+```
+
 You can also update `app/core/config.py` to use a custom model path.
 
 ## Running the API
@@ -37,7 +45,6 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 * Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
-
 
 ## API Usage
 
@@ -56,8 +63,6 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
   "num_detections": 4,
   "detections": [
     {
-      "class_id": 0,
-      "class_name": "receipt",
       "confidence": 0.87,
       "bbox_xyxy": [102.4, 215.1, 389.7, 610.9],
       "bbox_normalized": [0.39, 0.65, 0.47, 0.62]
@@ -94,6 +99,7 @@ ScannedReceiptAPI/
 │       └─ config.py       # Model & output configuration
 │
 ├─ environment.yml         # Conda environment file
+├─ download_model.py       # Script to download model from Google Drive
 ├─ model.pt                # YOLOv9 model
 └─ README.md
 ```
