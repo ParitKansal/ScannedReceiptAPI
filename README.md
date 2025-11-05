@@ -17,7 +17,7 @@ Works on **Linux, macOS, and Windows**.
 1. **Clone the repository**
 
 ```bash
-gh repo clone ParitKansal/ScannedReceiptAPI
+git clone ParitKansal/ScannedReceiptAPI
 cd ScannedReceiptAPI
 ```
 
