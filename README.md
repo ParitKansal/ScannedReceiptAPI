@@ -14,10 +14,12 @@ Works on **Linux, macOS, and Windows**.
 
 ## ⚙️ Installation
 
+### **Option 1 — With Conda** (Recommended if you already use Conda)
+
 1. **Clone the repository**
 
 ```bash
-git clone ParitKansal/ScannedReceiptAPI
+git clone https://github.com/ParitKansal/ScannedReceiptAPI
 cd ScannedReceiptAPI
 ```
 
@@ -33,14 +35,53 @@ conda activate ScannedReceipt-fastapi
 You can either:
 
 * Place your YOLO `.pt` model in the project root (default: `model.pt`)
-* **Or download automatically using:**
+* **Or download automatically:**
 
 ```bash
 python download_model.py
 ```
 
-You can also modify the model path in `app/core/config.py`.
+### **Option 2 — Without Conda** (Using `pip` + Virtual Environment)
 
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/ParitKansal/ScannedReceiptAPI
+cd ScannedReceiptAPI
+```
+
+2. **Create & activate virtual environment**
+
+```bash
+python -m venv venv
+```
+
+* **Windows**
+
+  ```bash
+  venv\Scripts\activate
+  ```
+
+* **Mac/Linux**
+
+  ```bash
+  source venv/bin/activate
+  ```
+
+3. **Install dependencies**
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+4. **Ensure model exists**
+
+```bash
+python download_model.py
+```
+
+(Or manually place `model.pt` in project root.)
 
 ## ▶️ Running the API
 
@@ -48,7 +89,8 @@ You can also modify the model path in `app/core/config.py`.
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-* Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+**Swagger UI:**
+[http://localhost:8000/docs](http://localhost:8000/docs)
 
 
 ## 🧠 API Usage
