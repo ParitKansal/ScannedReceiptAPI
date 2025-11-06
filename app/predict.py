@@ -1,3 +1,4 @@
+# app/predict.py
 from fastapi import UploadFile
 from ultralytics import YOLO
 from app.core.config import get_settings
@@ -57,6 +58,15 @@ def merge_boxes_iterative(df, containment_threshold=0.9, max_iter=10):
         df = new_df
     return df
 
+# NEW: recompute normalized fields after merging
+def _add_normalized_fields(df_boxes: pd.DataFrame, width: int, height: int) -> pd.DataFrame:
+    df_boxes = df_boxes.copy()
+    df_boxes["x_center"] = (df_boxes["x1"] + df_boxes["x2"]) / 2 / width
+    df_boxes["y_center"] = (df_boxes["y1"] + df_boxes["y2"]) / 2 / height
+    df_boxes["w_norm"]   = (df_boxes["x2"] - df_boxes["x1"]) / width
+    df_boxes["h_norm"]   = (df_boxes["y2"] - df_boxes["y1"]) / height
+    return df_boxes
+
 # --- Prediction function ---
 def predict_image(file: UploadFile):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -97,6 +107,8 @@ def predict_image(file: UploadFile):
     df = pd.DataFrame(detections)
     if not df.empty:
         df_merged = merge_boxes_iterative(df, containment_threshold=0.9)
+        # IMPORTANT: recompute normalized fields after merging (prevents NaN)
+        df_merged = _add_normalized_fields(df_merged, width=width, height=height)
         detections = df_merged.to_dict(orient="records")
 
     return {
@@ -105,4 +117,3 @@ def predict_image(file: UploadFile):
         "num_detections": len(detections),
         "detections": detections
     }
-
